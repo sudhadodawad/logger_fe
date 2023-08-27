@@ -18,7 +18,7 @@ function App() {
 
   const getAllLogs = () => {
     axios
-      .get("http://142.93.204.107:3001/api/logs/")
+      .get("http://45.55.32.246:3001/api/logs/")
       .then((response) => {
         console.log(response.data);
         setProducts(response.data);
@@ -29,7 +29,7 @@ function App() {
   };
   const getAllProducts = () => {
     axios
-      .get("http://142.93.204.107:3001/api/productSearch/")
+      .get("http://45.55.32.246:3001/api/productSearch/")
       .then((response) => {
         console.log(response.data);
         setProductList(response.data);
@@ -47,7 +47,7 @@ function App() {
   const onChange = (value) => {
     console.log(`selected ${value}`);
     axios
-      .get("http://142.93.204.107:3001/api/logsFilter/", {
+      .get("http://45.55.32.246:3001/api/logsFilter/", {
         params: { severity: value },
       })
       .then((response) => {
@@ -61,7 +61,7 @@ function App() {
   const onSearch = (value) => {
     console.log(`selected ${value}`);
     axios
-      .get("http://142.93.204.107:3001/api/productFilter/", {
+      .get("http://45.55.32.246:3001/api/productFilter/", {
         params: { product: value },
       })
       .then((response) => {
