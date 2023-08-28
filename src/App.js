@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Col, Row, Select, Table } from "antd";
+import { Col, Row, Select, Table, Form, Button } from "antd";
 import "./App.css";
 
 const { Option } = Select;
@@ -8,9 +8,10 @@ const { Option } = Select;
 function App() {
   const [products, setProducts] = useState([
     {
-      product: "new product2",
-      timestamp: "2023-08-02T00:00:00.000Z",
-      message: "this is new log",
+      product: "",
+      timestamp: "",
+      message: "",
+      severity:""
     },
   ]);
   const [productsList, setProductList] = useState([{ product: "" }]);
@@ -44,26 +45,17 @@ function App() {
     getAllProducts();
   }, []);
 
-  const onChange = (value) => {
-    console.log(`selected ${value}`);
+ 
+  const onFinish = (values) => {
+    console.log("Form values:", values);
+
+    const postData = {
+      severity: values.severity,
+      product: values.product,
+    };
+
     axios
-      .get("http://45.55.32.246:3001/api/logsFilter/", {
-        params: { severity: value },
-      })
-      .then((response) => {
-        console.log(response.data);
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-      });
-  };
-  const onSearch = (value) => {
-    console.log(`selected ${value}`);
-    axios
-      .get("http://45.55.32.246:3001/api/productFilter/", {
-        params: { product: value },
-      })
+      .post("http://45.55.32.246:3001/api/logsFilter/", postData)
       .then((response) => {
         console.log(response.data);
         setProducts(response.data);
@@ -115,27 +107,43 @@ function App() {
   return (
     <div className="App">
       <h1>Centralized Logging System</h1>
-      <Select
-        showSearch
-        style={{ width: 200 }}
-        placeholder="Search by product name"
-        optionFilterProp="children"
-        onChange={onSearch} // Handle search input
-      >
-        {productsList.map((product) => (
-          // Disticnt product names
-
-          <Option key={product.product} value={product.product}>
-            {product.product}
-          </Option>
-        ))}
-      </Select>
-      <Select placeholder="Select a severity" onChange={onChange}>
-        <Option value="all">All</Option>
-        <Option value="info">Info</Option>
-        <Option value="error">Error</Option>
-        <Option value="critical">Critical</Option>
-      </Select>
+      <Form onFinish={onFinish}>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item  name="product">
+              <Select
+                showSearch
+                placeholder="Select a product"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {productsList.map((product) => (
+                  <Option key={product.product} value={product.product}>
+                    {product.product}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item  name="severity">
+              <Select placeholder="Select a severity">
+                <Option value="all">All</Option>
+                <Option value="info">Info</Option>
+                <Option value="error">Error</Option>
+                <Option value="critical">Critical</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Button type="primary" htmlType="submit">
+              Search
+            </Button>
+          </Col>
+        </Row>
+      </Form>
       <Row align={"center"}>
         <Table
           columns={columns}
